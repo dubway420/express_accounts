@@ -16,7 +16,6 @@ function detectCurrency(words) {
         var found = words.match(RegExp(currency_symbol));
 
         if (found) {
-            console.log(currencies[i].name + " found!")
             if (detected > -1) {console.log("Warning, currency " + currencies[detected].name + " previously found")};
             detected = i;
             first_index = found.index;
@@ -43,12 +42,18 @@ function extractTotal(words) {
     for (var i = 0; i < currency_info[2]; i++) {
 
       var end = words.indexOf(" ", start)
-      values.push(parseFloat(words.substring(start+1, end)))
+
+      // console.log(parseFloat(words.substring(start+1, end)), Number.isFinite(parseFloat(words.substring(start+1, end))))
+      
+      if (Number.isFinite(parseFloat(words.substring(start+1, end)))) {
+        values.push(parseFloat(words.substring(start+1, end)))
+      }
 
       start = words.indexOf(symbol, end)
 
     }
 
+ 
     return "Total value: " + symbol + String(Math.max(...values));
   } else {
 
@@ -57,19 +62,46 @@ function extractTotal(words) {
 
 }
 
-function valueWrapper(words) {
+function getDate(d)
+{
+    console.log(d)
 
-  if (words === placeholder) {
+    var day, month, year;
 
-    return words
-  } 
+    var result = d.match(/\d{2}([\/.-])\d{2}\1\d{2}/);
+    
+    console.log("result 2: " + result)
 
-  else {
-    return extractTotal(words)
+    if(null != result) {
+      dateSplitted = result[0].split(result[1]);
+      day = dateSplitted[0];
+      month = dateSplitted[1];
+      year = dateSplitted[2];
   }
 
-
+    result = d.match(/\d{2}([\/.-])\d{2}\1\d{4}/);
+    
+    if(null != result) {
+        
+        var dateSplitted = result[0].split(result[1]);
+        day = dateSplitted[0];
+        month = dateSplitted[1];
+        year = dateSplitted[2];
+    }
+    
+    if(month>12) {
+        var aux = day;
+        day = month;
+        month = aux;
+    }
+    
+    return day+"/"+month+"/"+year;
 }
 
 
-export default extractTotal
+function getData(words) {
+
+  return [extractTotal(words), getDate(words)]
+}
+
+export default getData

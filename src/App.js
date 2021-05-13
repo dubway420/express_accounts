@@ -1,5 +1,5 @@
 import './App.css';
-import extractTotal from './extractors'
+import getData from './extractors'
 // import { useEffect, useState } from 'react';
 import { createWorker } from 'tesseract.js';
 import {placeholder} from './constants' 
@@ -36,8 +36,9 @@ class App extends React.Component {
     await this.worker.loadLanguage('eng');
     await this.worker.initialize('eng');
     const { data: { text } } = await this.worker.recognize(this.state.file);
-    this.setState({text: extractTotal(text),
-                   progress: ""});
+    var extracted = getData(String(text))
+    this.setState({text: extracted[0],
+                   progress: "Date: " + extracted[1]});
 
   };
 
@@ -65,7 +66,7 @@ class App extends React.Component {
   }
 
   render() {
-    console.log("Text: " + this.state.text) 
+    // console.log("Text: " + this.state.text) 
     return (
       <div className="container">
         <p>{this.setText(this.state.text)}</p>
