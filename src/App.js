@@ -15,16 +15,29 @@ class App extends React.Component {
     this.handleChange = this.handleChange.bind(this)
   }
 
-  worker = createWorker({
-    logger: m => console.log(m),
-  });
+  setProgress(m) {
+
+
+    if (m.progress !== 0 && m.progress !== 0.5 && m.progress !== 1){
+ 
+     var prog = "Progress: " + Math.round(m.progress*100) + "%"
+     this.setState({progress: prog})
+    }
+   }
+ 
+   worker = createWorker({
+     logger: m => this.setProgress(m),
+   });
+
+
 
   doOCR = async () => {
     await this.worker.load();
     await this.worker.loadLanguage('eng');
     await this.worker.initialize('eng');
     const { data: { text } } = await this.worker.recognize(this.state.file);
-    this.setState({text: extractTotal(text)});
+    this.setState({text: extractTotal(text),
+                   progress: ""});
 
   };
 
@@ -39,12 +52,27 @@ class App extends React.Component {
     this.doOCR()
 
   }
+
+  setText(input){
+
+    if (!input) {
+      return "Please select a receipt"   
+    } 
+    else { 
+      return input
+    }
+
+  }
+
   render() {
+    console.log("Text: " + this.state.text) 
     return (
       <div className="container">
+        <p>{this.setText(this.state.text)}</p>
+        <p>{this.state.progress}</p>
         <input type="file" onChange={this.handleChange}/>
-        <img src={this.state.file} className='logo'/>
-        <p>{this.state.text}</p>
+        <img src={this.state.file} className='logo' alt=""/>
+        
       </div>
     );
   }
