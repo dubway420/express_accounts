@@ -15,8 +15,8 @@ function detectCurrency(words) {
 
         var found = words.match(RegExp(currency_symbol));
 
-        if (found) {
-            if (detected > -1) {console.log("Warning, currency " + currencies[detected].name + " previously found")};
+        if (found && detected == -1) {
+            
             detected = i;
             first_index = found.index;
             num = (words.match(RegExp(currency_symbol, "ig")).length);
