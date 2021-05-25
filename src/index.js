@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {version} from './constants'
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    <footer> {"Version: " + version}</footer>
   </React.StrictMode>,
   document.getElementById('root')
 );

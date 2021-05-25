@@ -1,8 +1,8 @@
 import './App.css';
-import getData from './extractors'
+import extractData from './extractors'
 // import { useEffect, useState } from 'react';
 import { createWorker } from 'tesseract.js';
-import {placeholder} from './constants' 
+import {placeholder, currencies, categories} from './constants' 
 
 const React = require('react')
 
@@ -36,15 +36,26 @@ class App extends React.Component {
     await this.worker.loadLanguage('eng');
     await this.worker.initialize('eng');
     const { data: { text } } = await this.worker.recognize(this.state.file);
-    var extracted = getData(String(text))
-    this.setState({text: extracted[0],
-                   progress: "Date: " + extracted[1]});
+
+    console.log(text)
+
+    var extracted = extractData(String(text))
+
+    this.setState({money: (currencies[extracted.money.currency].symbol + extracted.money.value),
+                   category: extracted.category})
+
+    if (extracted.date){
+      this.setState({progress: "Date: " + extracted.date.day + "/" + extracted.date.month + "/" + extracted.date.year});
+    }
+    else {
+      this.setState({progress: "Cannot detect date"});
+    }
 
   };
 
   handleChange(event) {
     
-    this.setState({text: placeholder});
+    this.setState({money: placeholder});
     this.setState({
       file: URL.createObjectURL(event.target.files[0]),
       
@@ -55,6 +66,8 @@ class App extends React.Component {
   }
 
   setText(input){
+    
+    console.log("out:" + input)
 
     if (!input) {
       return "Please select a receipt"   
@@ -66,11 +79,12 @@ class App extends React.Component {
   }
 
   render() {
-    // console.log("Text: " + this.state.text) 
+    
     return (
       <div className="container">
-        <p>{this.setText(this.state.text)}</p>
+        <p>{this.setText(this.state.money)}</p>
         <p>{this.state.progress}</p>
+        <p>{this.state.category}</p>
         <input type="file" onChange={this.handleChange}/>
         <img src={this.state.file} className='logo' alt=""/>
         
@@ -81,49 +95,3 @@ class App extends React.Component {
 
 export default App
 
-// import React, { useEffect, useState } from 'react';
-// import { createWorker } from 'tesseract.js';
-// import './App.css';
-// import image from './rec6.jpeg'
-// import valueWrapper from './extractors'
-// import {placeholder} from './constants' 
-
-// function handleChange(event) {
-//     this.setState({
-//       file: URL.createObjectURL(event.target.files[0])
-//     })
-//   }
-
-// function App() {
-
-//   const worker = createWorker({
-//     logger: m => console.log(m),
-//   });
-//   const doOCR = async () => {
-//     await worker.load();
-//     await worker.loadLanguage('eng');
-//     await worker.initialize('eng');
-//     const { data: { text } } = await worker.recognize(image);
-//     setOcr(text);
-//   };
-//   const [ocr, setOcr] = useState(placeholder);
-//   useEffect(() => {
-//     doOCR();
-//   });
-
-  
-//   return (
-//     <div className="App" className="container">
-      
-
-          
-
-//       <img src={image} alt="Italian Trulli" className='logo'></img>
-//       <p>{valueWrapper(ocr)}</p>
-//     </div>
-//   );
-// }
-
-
-
-// export default App;
